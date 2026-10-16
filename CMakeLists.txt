@@ -23,3 +23,9 @@ target_link_libraries(bitmap_test PRIVATE bitmap_lib)
 target_compile_options(bitmap_test PRIVATE
     -Wall -Wextra -Wpedantic -Wshadow
 )
+
+add_executable(bitmap_demo src/bitmap_demo.cpp)
+target_link_libraries(bitmap_demo PRIVATE bitmap_lib)
+target_compile_options(bitmap_demo PRIVATE
+	-Wall -Wextra -Wpedantic -Wshadow
+)
