@@ -22,7 +22,11 @@ add_executable(bitmap_test src/bitmap_test.cpp)
 target_link_libraries(bitmap_test PRIVATE bitmap_lib)
 target_compile_options(bitmap_test PRIVATE
     -Wall -Wextra -Wpedantic -Wshadow
+    -UNDEBUG
 )
+
+enable_testing()
+add_test(NAME bitmap_test COMMAND bitmap_test)
 
 add_executable(bitmap_demo src/bitmap_demo.cpp)
 target_link_libraries(bitmap_demo PRIVATE bitmap_lib)

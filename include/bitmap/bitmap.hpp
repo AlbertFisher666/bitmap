@@ -54,10 +54,10 @@ typedef size_t    bm_size;
  */
 
 struct Bitmap {
-    u64*     words;
-    bm_size  n_bits;
-    bm_size  n_words;
-    bm_size  count;
+    u64*     words   = nullptr;
+    bm_size  n_bits  = 0;
+    bm_size  n_words = 0;
+    bm_size  count   = 0;
 };
 
 /* ============================================================
