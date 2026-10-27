@@ -1,5 +1,5 @@
 /* ============================================================
- * bitmap_demo.c
+ * bitmap_demo.cpp
  * Field test: emulate a CP+ disk block allocator on top of
  * the bitmap library.
  *
