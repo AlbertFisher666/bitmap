@@ -8,15 +8,11 @@ build plan.
 
 ## Status
 
-Work in progress.
-
 Done:
 - include/bitmap/bitmap.hpp - interface
 - src/bitmap.cpp - implementation
-
-Not yet:
-- src/bitmap_test.cpp - test program (CMake target, not yet written)
-- full test suite
+- src/bitmap_test.cpp - full test suite (12 sections)
+- src/bitmap_demo.cpp - CP+ disk block allocator demo
 
 ## API summary
 
@@ -37,7 +33,7 @@ Logical:
     bm_and, bm_or, bm_xor, bm_not, bm_copy
 
 Diagnostics:
-    bm_check
+    bm_check, bm_error_string
 
 ## Requirements
 
@@ -53,14 +49,18 @@ Diagnostics:
 ## Test
 
     ./build/bitmap_test
+    ./build/bitmap_demo
 
-(Test program not yet written. Build will fail at link
-until src/bitmap_test.cpp exists.)
+The test suite covers 12 sections: empty bitmap, single bit,
+word boundaries, basic ops, mass ops, find, recount, logic,
+NOT with trailing bits, check diagnostics, error strings, and
+invalid calls. The demo emulates a CP+ disk block allocator on
+top of the bitmap and exercises the library end to end.
 
 ## Layout
 
     include/bitmap/    public headers
-    src/               library and test sources
+    src/               library, test, and demo sources
     ROADMAP.md         development plan and reference
     CMakeLists.txt     build configuration
     README.md          this document
