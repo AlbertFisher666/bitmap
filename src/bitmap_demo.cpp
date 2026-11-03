@@ -53,7 +53,7 @@ static int free_range(Bitmap* bm, bm_size from, bm_size count) {
 static bm_size alloc_one(Bitmap* bm) {
     bm_size idx = bm_find_first_clear(bm);
     if (idx == BM_NOT_FOUND) return BM_NOT_FOUND;
-    bm_set(bm, idx);
+    assert(bm_set(bm, idx) == BM_OK);
     return idx;
 }
 
@@ -68,21 +68,14 @@ int main(void) {
     printf("Sectors: %d, system: %d\n\n", DISK_SECTORS, SYSTEM_SECTORS);
 
     /* 1. Init the bitmap. */
-    if (bm_init(&disk, DISK_SECTORS) != BM_OK) {
-        fprintf(stderr, "bm_init failed\n");
-        return 1;
-    }
+    assert(bm_init(&disk, DISK_SECTORS) == BM_OK);
     printf("disk bitmap: %lu bits, %lu words, %lu set\n",
            (unsigned long) bm_size_of(&disk),
            (unsigned long) disk.n_words,
            (unsigned long) bm_count(&disk));
 
     /* 2. Mark system sectors. */
-    if (mark_range(&disk, 0, SYSTEM_SECTORS) != BM_OK) {
-        fprintf(stderr, "mark system failed\n");
-        bm_free(&disk);
-        return 1;
-    }
+    assert(mark_range(&disk, 0, SYSTEM_SECTORS) == BM_OK);
     printf("system sectors marked: count = %lu\n",
            (unsigned long) bm_count(&disk));
     assert(bm_count(&disk) == SYSTEM_SECTORS);
@@ -92,7 +85,7 @@ int main(void) {
     {
         bm_size start = alloc_one(&disk);
         assert(start == SYSTEM_SECTORS);   /* 5 */
-        mark_range(&disk, start + 1, 3);
+        assert(mark_range(&disk, start + 1, 3) == BM_OK);
         printf("  file A at sectors %lu..%lu\n",
                (unsigned long) start,
                (unsigned long) (start + 3));
@@ -104,7 +97,7 @@ int main(void) {
     {
         bm_size start = alloc_one(&disk);
         assert(start == SYSTEM_SECTORS + 4);   /* 9 */
-        mark_range(&disk, start + 1, 1);
+        assert(mark_range(&disk, start + 1, 1) == BM_OK);
         printf("  file B at sectors %lu..%lu\n",
                (unsigned long) start,
                (unsigned long) (start + 1));
@@ -116,7 +109,7 @@ int main(void) {
     {
         bm_size start = alloc_one(&disk);
         assert(start == SYSTEM_SECTORS + 6);   /* 11 */
-        mark_range(&disk, start + 1, 2);
+        assert(mark_range(&disk, start + 1, 2) == BM_OK);
         printf("  file C at sectors %lu..%lu\n",
                (unsigned long) start,
                (unsigned long) (start + 2));
@@ -130,7 +123,7 @@ int main(void) {
 
     /* 7. Free file B (2 sectors at 9..10). */
     printf("free file B (sectors 9..10)\n");
-    free_range(&disk, SYSTEM_SECTORS + 4, 2);
+    assert(free_range(&disk, SYSTEM_SECTORS + 4, 2) == BM_OK);
     assert(bm_count(&disk) == SYSTEM_SECTORS + 7);
     assert(bm_test(&disk, 9) == 0);
     assert(bm_test(&disk, 10) == 0);
@@ -141,7 +134,7 @@ int main(void) {
     {
         bm_size start = alloc_one(&disk);
         assert(start == 9);
-        mark_range(&disk, start + 1, 1);
+        assert(mark_range(&disk, start + 1, 1) == BM_OK);
         printf("  file D at sectors %lu..%lu\n",
                (unsigned long) start,
                (unsigned long) (start + 1));

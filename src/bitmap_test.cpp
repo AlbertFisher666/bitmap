@@ -79,10 +79,18 @@ static void test_single_bit(void) {
 static void test_word_boundaries(void) {
     Bitmap bm;
 
+    /* One bit short of a word. */
+    assert(bm_init(&bm, 63) == BM_OK);
+    assert(bm.n_words == 1);
+    assert(bm_set_all(&bm) == BM_OK);
+    assert(bm.count == 63);
+    assert(bm.words[0] == (1ULL << 63) - 1);
+    assert(bm_check(&bm) == 0);
+    bm_free(&bm);
+
     /* Exactly one word. */
     assert(bm_init(&bm, 64) == BM_OK);
     assert(bm.n_words == 1);
-
     assert(bm_set(&bm, 0) == BM_OK);
     assert(bm_set(&bm, 63) == BM_OK);
     assert(bm.count == 2);
@@ -92,7 +100,6 @@ static void test_word_boundaries(void) {
     /* One bit into the second word. */
     assert(bm_init(&bm, 65) == BM_OK);
     assert(bm.n_words == 2);
-
     assert(bm_set(&bm, 64) == BM_OK);
     assert(bm.count == 1);
     assert(bm_test(&bm, 64) == 1);
@@ -103,7 +110,6 @@ static void test_word_boundaries(void) {
     /* Two full words. */
     assert(bm_init(&bm, 128) == BM_OK);
     assert(bm.n_words == 2);
-
     assert(bm_set(&bm, 0) == BM_OK);
     assert(bm_set(&bm, 64) == BM_OK);
     assert(bm_set(&bm, 127) == BM_OK);
@@ -175,6 +181,11 @@ static void test_mass_ops(void) {
     extra = bm.n_words * BM_BITS_PER_WORD - bm.n_bits;  /* 28 */
     trailing = bm.words[bm.n_words - 1] >> (64 - extra);
     assert(trailing == 0);
+
+    /* Repeat set_all: count does not grow. */
+    assert(bm_set_all(&bm) == BM_OK);
+    assert(bm.count == 100);
+    assert(bm_check(&bm) == 0);
 
     assert(bm_clear_all(&bm) == BM_OK);
     assert(bm.count == 0);
@@ -356,15 +367,10 @@ static void test_check(void) {
     assert(bm_check(&bm) > 0);
     bm.count = 0;
 
-    /* Corrupt n_words: check must report. */
+    /* Corrupt n_words: check must report, must not crash. */
     bm.n_words = 0;
     assert(bm_check(&bm) > 0);
     bm.n_words = 1;
-
-    printf("n_words=%lu count=%lu word[0]=0x%016llX\n",
-		    (unsigned long) bm.n_words,
-		    (unsigned long) bm.count,
-		    (unsigned long long) bm.words[0]);
 
     /* Restore: no problems. */
     assert(bm_check(&bm) == 0);
@@ -372,6 +378,9 @@ static void test_check(void) {
 
     /* Freed bitmap: no problems. */
     assert(bm_check(&bm) == 0);
+
+    /* NULL: one problem, no crash. */
+    assert(bm_check(NULL) == 1);
 }
 
 /* ============================================================
@@ -402,6 +411,13 @@ static void test_invalid(void) {
     assert(bm_test(&bm, 0) == 0);
     assert(bm_valid(&bm) == 0);
 
+    /* NULL lifecycle. */
+    assert(bm_init(NULL, 10) == BM_ERR_INVALID);
+    bm_free(NULL);                      /* no-op, must not crash */
+    assert(bm_size_of(NULL) == 0);
+    assert(bm_count(NULL) == 0);
+    assert(bm_valid(NULL) == 0);
+
     /* Invalid source for logic ops. */
     {
         Bitmap c;
@@ -414,22 +430,39 @@ static void test_invalid(void) {
 }
 
 /* ============================================================
+ * Section 13: double init
+ * ============================================================ */
+
+static void test_double_init(void) {
+    Bitmap bm;
+
+    assert(bm_init(&bm, 100) == BM_OK);
+    assert(bm_init(&bm, 200) == BM_OK);   /* must free old storage */
+    assert(bm.n_bits == 200);
+    assert(bm.n_words == 4);
+    assert(bm.count == 0);
+    assert(bm_check(&bm) == 0);
+    bm_free(&bm);
+}
+
+/* ============================================================
  * main
  * ============================================================ */
 
 int main(void) {
-    printf(">>> test_empty_init\n");    test_empty_init();
-    printf(">>> test_single_bit\n");    test_single_bit();
+    printf(">>> test_empty_init\n");     test_empty_init();
+    printf(">>> test_single_bit\n");     test_single_bit();
     printf(">>> test_word_boundaries\n"); test_word_boundaries();
-    printf(">>> test_basic_ops\n");     test_basic_ops();
-    printf(">>> test_mass_ops\n");      test_mass_ops();
-    printf(">>> test_find\n");          test_find();
-    printf(">>> test_recount\n");       test_recount();
-    printf(">>> test_logic\n");         test_logic();
-    printf(">>> test_not_trailing\n");  test_not_trailing();
-    printf(">>> test_check\n");         test_check();
-    printf(">>> test_error_strings\n"); test_error_strings();
-    printf(">>> test_invalid\n");       test_invalid();
+    printf(">>> test_basic_ops\n");      test_basic_ops();
+    printf(">>> test_mass_ops\n");       test_mass_ops();
+    printf(">>> test_find\n");           test_find();
+    printf(">>> test_recount\n");        test_recount();
+    printf(">>> test_logic\n");          test_logic();
+    printf(">>> test_not_trailing\n");   test_not_trailing();
+    printf(">>> test_check\n");          test_check();
+    printf(">>> test_error_strings\n");  test_error_strings();
+    printf(">>> test_double_init\n");   test_double_init();
+    printf(">>> test_invalid\n");        test_invalid();
 
     printf("all tests passed\n");
     return 0;

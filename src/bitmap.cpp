@@ -17,9 +17,12 @@
  * Internal helpers
  * ============================================================ */
 
-/* Clear trailing bits beyond n_bits in the last word. */
+/* Clear trailing bits beyond n_bits in the last word.
+ * Only meaningful when there is at least one word. */
 static void bm_clear_trailing(Bitmap* bm) {
     bm_size extra;
+
+    if (bm->n_words == 0) return;
 
     extra = bm->n_words * BM_BITS_PER_WORD - bm->n_bits;
     if (extra > 0) {
@@ -49,12 +52,13 @@ const char* bm_error_string(int err) {
 int bm_init(Bitmap* bm, bm_size n_bits) {
     bm_size bytes;
 
+    if (bm == NULL) return BM_ERR_INVALID;
+
+    /* Release previous storage, if any. */
+    bm_free(bm);
+
     /* Empty bitmap: valid, but no storage. */
     if (n_bits == 0) {
-        bm->words   = NULL;
-        bm->n_bits  = 0;
-        bm->n_words = 0;
-        bm->count   = 0;
         return BM_OK;
     }
 
@@ -65,6 +69,8 @@ int bm_init(Bitmap* bm, bm_size n_bits) {
     bytes = bm->n_words * sizeof(u64);
     bm->words = (u64*) malloc(bytes);
     if (bm->words == NULL) {
+        bm->n_bits  = 0;
+        bm->n_words = 0;
         return BM_ERR_NOMEM;
     }
     memset(bm->words, 0, bytes);
@@ -72,6 +78,8 @@ int bm_init(Bitmap* bm, bm_size n_bits) {
 }
 
 void bm_free(Bitmap* bm) {
+    if (bm == NULL) return;
+
     if (bm->words != NULL) {
         free(bm->words);
     }
@@ -162,10 +170,12 @@ int bm_toggle(Bitmap* bm, bm_size index) {
 }
 
 bm_size bm_size_of(const Bitmap* bm) {
+    if (bm == NULL) return 0;
     return bm->n_bits;
 }
 
 bm_size bm_count(const Bitmap* bm) {
+    if (bm == NULL) return 0;
     return bm->count;
 }
 
@@ -230,12 +240,13 @@ bm_size bm_find_first_set(const Bitmap* bm) {
     if (!bm_valid(bm)) return BM_NOT_FOUND;
 
     for (w = 0; w < bm->n_words; w++) {
-        /* Skip empty words: 64 bits at a time. */
         if (bm->words[w] == 0) continue;
 
         bit = __builtin_ctzll(bm->words[w]);
         global = w * BM_BITS_PER_WORD + (bm_size) bit;
 
+        /* Invariant: trailing bits are 0. A set bit beyond n_bits
+         * means the bitmap is corrupt; report not found. */
         if (global >= bm->n_bits) return BM_NOT_FOUND;
         return global;
     }
@@ -257,6 +268,8 @@ bm_size bm_find_first_clear(const Bitmap* bm) {
         bit = __builtin_ctzll(inverted);
         global = w * BM_BITS_PER_WORD + (bm_size) bit;
 
+        /* Same invariant: a "clear" bit beyond n_bits is padding,
+         * not a real free slot. */
         if (global >= bm->n_bits) return BM_NOT_FOUND;
         return global;
     }
@@ -278,10 +291,7 @@ bm_size bm_recount(const Bitmap* bm) {
 
 /* ============================================================
  * Logical operations
- * ============================================================
- *
- * Result is written to c. c is freed first if it was in use.
- */
+ * ============================================================ */
 
 int bm_and(const Bitmap* a, const Bitmap* b, Bitmap* c) {
     bm_size i;
@@ -388,6 +398,11 @@ u32 bm_check(const Bitmap* bm) {
 
     problems = 0;
 
+    if (bm == NULL) {
+        fprintf(stderr, "check: null bm\n");
+        return 1;
+    }
+
     /* Freed or empty bitmap must have all-zero fields. */
     if (bm->words == NULL) {
         if (bm->n_bits != 0 || bm->n_words != 0 || bm->count != 0) {
@@ -416,13 +431,15 @@ u32 bm_check(const Bitmap* bm) {
         problems++;
     }
 
-    /* Trailing bits must be 0. */
-    extra = bm->n_words * BM_BITS_PER_WORD - bm->n_bits;
-    if (extra > 0) {
-        trailing = bm->words[bm->n_words - 1] >> (64 - extra);
-        if (trailing != 0) {
-            fprintf(stderr, "check: trailing bits not clear\n");
-            problems++;
+    /* Trailing bits are only meaningful when there is a last word. */
+    if (bm->n_words > 0) {
+        extra = bm->n_words * BM_BITS_PER_WORD - bm->n_bits;
+        if (extra > 0) {
+            trailing = bm->words[bm->n_words - 1] >> (BM_BITS_PER_WORD - extra);
+            if (trailing != 0) {
+                fprintf(stderr, "check: trailing bits not clear\n");
+                problems++;
+            }
         }
     }
 
