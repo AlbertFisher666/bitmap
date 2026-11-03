@@ -1514,9 +1514,10 @@ git commit -m "bitmap: initial implementation"
 
 **Артефакты:**
 - `include/bitmap/bitmap.hpp` — интерфейс.
-- `src/bitmap.cpp` — реализация.
-- `src/bitmap_test.cpp` — 13 секций тестов.
-- `src/bitmap_demo.cpp` — CP+ disk block allocator demo.
+- `src/bitmap.cpp` - реализация.
+- `src/bitmap_test.cpp` - 13 секций тестов.
+- `src/bitmap_demo.cpp` - CP+ disk block allocator demo.
+- `tests/sieve/sieve.cpp` - решето Эратосфена на Bitmap (демонстрация).
 - `README.md` — описание, API, сборка, тесты.
 - `LICENSE` — MIT.
 
