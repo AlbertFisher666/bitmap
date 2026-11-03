@@ -2,6 +2,18 @@
 
 План разработки битовой карты (bitmap) на C++.
 
+**Статус:** завершён. Все 8 фаз пройдены. Проект закрыт.
+
+**Что это за файл:** не только план, но и справочник по C++
+(Часть A), теория bitmap (Часть B) и запись пройденного пути
+(Часть C). Части A и B полезны вне проекта — их можно читать
+отдельно.
+
+**Структура:**
+- Часть A — справочник C++ (битовые операции, __builtin, типы).
+- Часть B — теория bitmap (индексация, set/clear/test, popcount).
+- Часть C — пошаговый план (8 фаз, все закрыты).
+
 ## Как пользоваться этим файлом
 
 - Работайте **сверху вниз**, шаг за шагом.
@@ -56,6 +68,7 @@
 
 - [Если застряли](#если-застряли)
 - [Когда возвращаться к наставнику](#когда-возвращаться-к-наставнику)
+- [Итог](#итог)
 
 ---
 
@@ -422,7 +435,7 @@ mkdir -p Test31/src
 cd Test31
 ```
 
-- [ ] Созданы `include/bitmap/` и `src/`.
+- [x] Созданы `include/bitmap/` и `src/`.
 
 ### 0.2. `CMakeLists.txt`
 
@@ -454,7 +467,7 @@ target_compile_options(bitmap_test PRIVATE
 )
 ```
 
-- [ ] `CMakeLists.txt` создан.
+- [x] `CMakeLists.txt` создан.
 
 ### 0.3. Пустые файлы
 
@@ -464,7 +477,7 @@ touch src/bitmap.cpp
 touch src/bitmap_test.cpp
 ```
 
-- [ ] Файлы созданы.
+- [x] Файлы созданы.
 
 **Чекпоинт 0.**
 
@@ -534,7 +547,7 @@ bool bm_valid(const Bitmap& bm);
 } // namespace bitmap
 ```
 
-- [ ] Заголовок написан.
+- [x] Заголовок написан.
 
 ### 1.2. `bitmap.cpp` — скелет
 
@@ -575,7 +588,7 @@ bool bm_valid(const Bitmap& bm) {
 } // namespace bitmap
 ```
 
-- [ ] Скелет написан.
+- [x] Скелет написан.
 
 ### 1.3. Реализовать `bm_init`
 
@@ -589,7 +602,7 @@ bool bm_valid(const Bitmap& bm) {
 6. Заполнить поля `n_bits`, `n_words`, `count = 0`.
 7. Вернуть `BmError::Ok`.
 
-- [ ] `bm_init` реализована.
+- [x] `bm_init` реализована.
 
 ### 1.4. Реализовать `bm_free`
 
@@ -598,7 +611,7 @@ bool bm_valid(const Bitmap& bm) {
 1. Если `words != nullptr` — `free(words)`.
 2. Обнулить все поля.
 
-- [ ] `bm_free` реализована.
+- [x] `bm_free` реализована.
 
 ### 1.5. Тест
 
@@ -642,7 +655,7 @@ int main() {
 }
 ```
 
-- [ ] Тест написан.
+- [x] Тест написан.
 
 ### 1.6. Сборка и запуск
 
@@ -683,7 +696,7 @@ std::size_t bm_size(const Bitmap& bm);
 std::size_t bm_count(const Bitmap& bm);
 ```
 
-- [ ] Объявления добавлены.
+- [x] Объявления добавлены.
 
 ### 2.2. Реализация
 
@@ -776,7 +789,7 @@ std::size_t bm_count(const Bitmap& bm) {
 }
 ```
 
-- [ ] Все функции реализованы.
+- [x] Все функции реализованы.
 
 ### 2.3. Тесты
 
@@ -825,7 +838,7 @@ void test_basic() {
 test_basic();
 ```
 
-- [ ] Тесты добавлены.
+- [x] Тесты добавлены.
 
 **Чекпоинт 2.**
 
@@ -846,7 +859,7 @@ BmError bm_clear_all(Bitmap& bm);
 void bm_print(const Bitmap& bm);
 ```
 
-- [ ] Объявления добавлены.
+- [x] Объявления добавлены.
 
 ### 3.2. Реализация
 
@@ -901,7 +914,7 @@ void bm_print(const Bitmap& bm) {
 }
 ```
 
-- [ ] Реализованы.
+- [x] Реализованы.
 
 ### 3.3. Тесты
 
@@ -932,7 +945,7 @@ void test_mass() {
 }
 ```
 
-- [ ] Тесты добавлены.
+- [x] Тесты добавлены.
 
 **Чекпойнт 3.**
 
@@ -953,7 +966,7 @@ std::size_t bm_find_first_clear(const Bitmap& bm);
 std::size_t bm_recount(const Bitmap& bm);
 ```
 
-- [ ] Объявления добавлены.
+- [x] Объявления добавлены.
 
 ### 4.2. Реализация
 
@@ -1006,7 +1019,7 @@ std::size_t bm_recount(const Bitmap& bm) {
 }
 ```
 
-- [ ] Реализованы.
+- [x] Реализованы.
 
 ### 4.3. Тесты
 
@@ -1044,7 +1057,7 @@ void test_find() {
 }
 ```
 
-- [ ] Тесты добавлены.
+- [x] Тесты добавлены.
 
 **Чекпоинт 4.**
 
@@ -1071,7 +1084,7 @@ BmError bm_not(const Bitmap& a, Bitmap& c);
 BmError bm_copy(const Bitmap& a, Bitmap& c);
 ```
 
-- [ ] Объявления добавлены.
+- [x] Объявления добавлены.
 
 ### 5.2. Реализация
 
@@ -1176,7 +1189,7 @@ BmError bm_copy(const Bitmap& a, Bitmap& c) {
 }
 ```
 
-- [ ] Реализованы.
+- [x] Реализованы.
 
 ### 5.3. Тесты
 
@@ -1230,7 +1243,7 @@ void test_logic() {
 }
 ```
 
-- [ ] Тесты добавлены.
+- [x] Тесты добавлены.
 
 **Чекпоинт 5.**
 
@@ -1245,7 +1258,7 @@ void test_logic() {
 u32 bm_check(const Bitmap& bm);
 ```
 
-- [ ] Объявление добавлено.
+- [x] Объявление добавлено.
 
 ### 6.2. Реализация
 
@@ -1291,7 +1304,7 @@ u32 bm_check(const Bitmap& bm) {
 }
 ```
 
-- [ ] Реализована.
+- [x] Реализована.
 
 ### 6.3. Тест
 
@@ -1319,7 +1332,7 @@ void test_check() {
 }
 ```
 
-- [ ] Тест добавлен.
+- [x] Тест добавлен.
 
 **Чекпоинт 6.**
 
@@ -1388,7 +1401,7 @@ void test_toggle_stress() {
 }
 ```
 
-- [ ] Тесты добавлены.
+- [x] Тесты добавлены.
 
 **Чекпоинт 7.**
 
@@ -1415,17 +1428,24 @@ int main() {
 }
 ```
 
-- [ ] Все тесты вызываются.
+- [x] Все тесты вызываются.
 
-### 8.2. Valgrind
+### 8.2. Valgrind / AddressSanitizer
 
-```bash
-valgrind --leak-check=full ./bitmap_test
-```
+Valgrind заменён на AddressSanitizer (встроен в GCC, не требует
+установки пакетов):
 
-**Ожидается:** `All heap blocks were freed`.
+    g++ -std=c++17 -g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer \
+        -Iinclude src/bitmap.cpp src/bitmap_test.cpp -o /tmp/bitmap_test_asan
+    /tmp/bitmap_test_asan
 
-- [ ] Нет утечек.
+    g++ -std=c++17 -g -O1 -fsanitize=address,undefined -fno-omit-frame-pointer \
+        -Iinclude src/bitmap.cpp src/bitmap_demo.cpp -o /tmp/bitmap_demo_asan
+    /tmp/bitmap_demo_asan
+
+**Ожидается:** нет вывода от ASan (значит, чисто).
+
+- [x] Нет утечек и UB.
 
 ### 8.3. README
 
@@ -1435,7 +1455,7 @@ valgrind --leak-check=full ./bitmap_test
 - Примеры API.
 - Как собрать и запустить.
 
-- [ ] README написан.
+- [x] README написан.
 
 ### 8.4. Git
 
@@ -1445,7 +1465,8 @@ git add .
 git commit -m "bitmap: initial implementation"
 ```
 
-- [ ] Закоммичено.
+- [x] Закоммичено.
+- [x] Запушено в origin/main.
 
 **Финальный чекпоинт.**
 
@@ -1472,3 +1493,40 @@ git commit -m "bitmap: initial implementation"
 - Не использовать `std::bitset` — цель **своя** реализация.
 - Не пропускать фазы.
 - Не отчаиваться. Bitmap — **проще** `hashtable`. Справитесь.
+
+---
+
+## Итог
+
+Проект завершён. Все 8 фаз пройдены:
+
+| Фаза | Что | Статус |
+|---|---|---|
+| 0 | Подготовка (структура, CMake, файлы) | [x] |
+| 1 | Структура и init/free | [x] |
+| 2 | Базовые операции (set/clear/test/toggle) | [x] |
+| 3 | Массовые операции (set_all/clear_all/print) | [x] |
+| 4 | Popcount и find | [x] |
+| 5 | Логические операции (and/or/xor/not/copy) | [x] |
+| 6 | Диагностика (bm_check) | [x] |
+| 7 | Стресс-тесты | [x] |
+| 8 | Финализация (README, ASan, git) | [x] |
+
+**Артефакты:**
+- `include/bitmap/bitmap.hpp` — интерфейс.
+- `src/bitmap.cpp` — реализация.
+- `src/bitmap_test.cpp` — 13 секций тестов.
+- `src/bitmap_demo.cpp` — CP+ disk block allocator demo.
+- `README.md` — описание, API, сборка, тесты.
+- `LICENSE` — MIT.
+
+**Проверено:**
+- Все тесты проходят.
+- ASan/UBSan чисто (нет утечек, нет UB).
+- Демо работает (аллокатор CP+ на 128 секторов).
+- Git-история чистая, запушена в origin/main.
+
+**Файл сохранён как есть** (Части A, B, C не удалены) — потому что:
+- Часть A — справочник по C++, полезен вне проекта.
+- Часть B — теория bitmap, полезна для будущих реализаций.
+- Часть C — запись пройденного пути, важна как история решений.
