@@ -29,4 +29,3 @@ compile_commands.json
 *.tmp
 *.swp
 *~
-build/
