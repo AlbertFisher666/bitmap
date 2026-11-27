@@ -78,13 +78,15 @@ file and line of the leak or UB.
 
 ## Layout
 
-    include/bitmap/    public headers
-    src/               library, test, and demo sources
-    build/             build output (gitignored)
-    ROADMAP.md         development plan and reference
-    CMakeLists.txt     build configuration
-    README.md          this document
-    LICENSE            MIT license text
+    include/bitmap/             public headers
+    src/                        library, test, and demo sources
+    tests/sieve/                Sieve of Eratosthenes (test artifact)
+    build/                      build output (gitignored)
+    ROADMAP.md                  development plan and reference
+    CMakeLists.txt              build configuration
+    README.md                   this document
+    LICENSE                     MIT license text
+    .github/workflows/ci.yml    build + test on push (CI)
 
 ## Design notes
 
@@ -99,6 +101,10 @@ file and line of the leak or UB.
 - bm_test returns 0 both for "clear" and for "error"; callers
   that need to distinguish must check bm_valid / index.
 
+## Version
+
+v1.0.1 - after cosmetic refactor (ASCII comment in sieve, CI). Logic unchanged from v1.0.
+
 ## License
 
-MIT, Copyright (c) 2026 Albert Ghosting Frangle (Albert Fisher)
+MIT. See LICENSE.

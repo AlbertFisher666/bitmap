@@ -1,0 +1,15 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: configure
+        run: cmake -B build -S .
+      - name: build
+        run: cmake --build build
+      - name: test
+        run: ./build/bitmap_test
+      - name: demo
+        run: ./build/bitmap_demo

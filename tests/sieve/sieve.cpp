@@ -89,7 +89,7 @@ int sieve_build(Bitmap* primes, bm_size n) {
     if (sieve_n_overflow(n))   return BM_ERR_RANGE;
 
     /* bm_init frees any previous storage. Aliasing (Bitmap b = a;)
-     * is the caller's responsibility — see README of bitmap. */
+     * is the caller's responsibility -- see README of bitmap. */
     err = sieve_alloc(primes, n);
     if (err != BM_OK) return err;
 
